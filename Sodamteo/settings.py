@@ -45,6 +45,8 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt",
     "Users",
     "Farm",
+    "CropDisease",
+    "PricePrediction",
 ]
 
 MIDDLEWARE = [
@@ -144,3 +146,5 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
 }
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
