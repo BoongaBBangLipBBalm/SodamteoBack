@@ -57,5 +57,26 @@ class GetFarmDisease(APIView):
         if not farm_name:
             return Response({"error": "Farm name is required"}, status=status.HTTP_400_BAD_REQUEST)
 
-        diseases = DiseaseLog.objects.filter(farmName=farm_name).values_list('disease', flat=True)
-        return Response({"diseases": list(diseases)}, status=status.HTTP_200_OK)
+        diseases = DiseaseLog.objects.filter(farmName=farm_name).values('disease', 'timestamp')
+
+        result = [{"disease": disease['disease'], "timestamp": disease['timestamp']} for disease in diseases]
+
+        return Response({"diseases": result}, status=status.HTTP_200_OK)
+
+
+class DeleteDiseaseLog(APIView):
+    """
+    질병 로그 삭제
+    """
+
+    def delete(self, request):
+        farm_name = request.data.get('farmName')
+        disease = request.data.get('disease')
+        timestamp = request.data.get('timestamp')
+
+        if not farm_name or not disease:
+            return Response({"error": "Farm name and disease are required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        DiseaseLog.objects.filter(farmName=farm_name, disease=disease, timestamp=timestamp).delete()
+
+        return Response({"message": "Disease log deleted successfully"}, status=status.HTTP_200_OK)

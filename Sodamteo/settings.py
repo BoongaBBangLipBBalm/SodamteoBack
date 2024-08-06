@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     "Users",
     "Farm",
     "CropDisease",
+    "PricePrediction",
 ]
 
 MIDDLEWARE = [
