@@ -140,6 +140,8 @@ EMAIL_HOST_USER = env('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
+AUTH_USER_MODEL = 'Users.User' #####################################################
+
 from datetime import timedelta
 
 SIMPLE_JWT = {

@@ -11,6 +11,8 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework_simplejwt.tokens import RefreshToken
 from .serializers import UserSerializer
 
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+
 User = get_user_model()
 
 
@@ -21,7 +23,7 @@ class UserCreate(generics.CreateAPIView):
 
     def perform_create(self, serializer):
         user = serializer.save()
-        token = RefreshToken.for_user(user).access_token
+        token = TokenObtainPairSerializer.get_token(user)
         verify_url = self.request.build_absolute_uri(reverse('verify-email', args=[str(token)]))
         send_mail(
             subject='Verify your email address',

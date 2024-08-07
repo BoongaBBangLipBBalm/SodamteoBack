@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 
+
 class UserManager(BaseUserManager):
     def create_user(self, email, username, password=None):
         if not email:
@@ -17,20 +18,22 @@ class UserManager(BaseUserManager):
         return user
 
     def create_superuser(self, email, username, password=None):
-        user = self.create_user(
+        superuser = self.create_user(
             email,
             username,
             password=password,
         )
-        user.is_superuser = True
-        user.is_staff = True
-        user.save(using=self._db)
-        return user
+
+        superuser.is_superuser = True
+        superuser.is_staff = True
+        superuser.save(using=self._db)
+        return superuser
+
 
 class User(AbstractBaseUser):
     email = models.EmailField(max_length=255, unique=True)
     username = models.CharField(max_length=255, unique=True)
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=False)
 
     objects = UserManager()
 
