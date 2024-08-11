@@ -1,4 +1,5 @@
 import os
+import jwt
 
 from rest_framework import status
 from rest_framework.response import Response
@@ -8,14 +9,22 @@ from Sodamteo import settings
 from .models import DiseaseLog
 from .detect_disease import detect_disease
 
+import os
+
+SECRET_KEY = settings.SECRET_KEY
+
 
 class DiseaseDetection(APIView):
     """
-    질병 탐지
+    질병 탐지 및 로그 저장
     """
-
     def post(self, request):
-        # 이미지 파일을 입력받음
+        auth_token = request.headers.get('Authorization', None).replace('Bearer ', '')
+        payload = jwt.decode(auth_token, SECRET_KEY, algorithms='HS256')
+
+        farmID = payload['farmID']
+
+        # 이미지 파일을 입력 받음
         image_file = request.FILES.get('image')
         if not image_file:
             return Response({"error": "No image provided"}, status=status.HTTP_400_BAD_REQUEST)
@@ -29,54 +38,62 @@ class DiseaseDetection(APIView):
         # 질병 탐지
         disease, confidence = detect_disease(temp_image_path)
 
-        # 질병 탐지 결과를 로그로 저장
-        farm_name = request.data.get('farmName')
-        if not farm_name:
-            return Response({"error": "Farm name is required"}, status=status.HTTP_400_BAD_REQUEST)
-
-        DiseaseLog.objects.create(farmName=farm_name, disease=disease)
+        DiseaseLog.objects.create(farmId=farmID, disease=disease, confidence=confidence)
 
         # 임시 파일 삭제
         os.remove(temp_image_path)
 
-        return Response({
+        response = Response({
             "disease": disease,
             "confidence": f"{confidence:.2f}%",
-            "message": "Disease detection successful"
-        }, status=status.HTTP_200_OK)
+            "message": "Successful Disease Detection"
+        }, status=status.HTTP_201_CREATED)
+
+        response['Authorization'] = 'Bearer ' + auth_token
+
+        return response
 
 
 class GetFarmDisease(APIView):
     """
     농장 질병 조회
     """
-
     def get(self, request):
-        farm_name = request.GET.get('farmName')
+        auth_token = request.headers.get('Authorization', None).replace('Bearer ', '')
+        payload = jwt.decode(auth_token, SECRET_KEY, algorithms='HS256')
 
-        if not farm_name:
-            return Response({"error": "Farm name is required"}, status=status.HTTP_400_BAD_REQUEST)
+        farmID = payload['farmID']
 
-        diseases = DiseaseLog.objects.filter(farmName=farm_name).values('disease', 'timestamp')
+        diseases = DiseaseLog.objects.filter(farmID=farmID)
 
-        result = [{"disease": disease['disease'], "timestamp": disease['timestamp']} for disease in diseases]
+        result = [{"timestamp": disease['timestamp'],
+                   "disease": disease['disease'],
+                   "confidence": disease['confidence']} for disease in diseases]
 
-        return Response({"diseases": result}, status=status.HTTP_200_OK)
+        response = Response({"diseases": result}, status=status.HTTP_200_OK)
+        response['Authorization'] = 'Bearer ' + auth_token
+
+        return response
 
 
 class DeleteDiseaseLog(APIView):
     """
     질병 로그 삭제
     """
-
     def delete(self, request):
-        farm_name = request.data.get('farmName')
-        disease = request.data.get('disease')
-        timestamp = request.data.get('timestamp')
+        # farm_name = request.data.get('farmName')
+        # disease = request.data.get('disease')
+        # timestamp = request.data.get('timestamp')
+        auth_token = request.headers.get('Authorization', None).replace('Bearer ', '')
+        diseaseID = request.data.get('diseasesID')
 
-        if not farm_name or not disease:
-            return Response({"error": "Farm name and disease are required"}, status=status.HTTP_400_BAD_REQUEST)
+        # if not farm_name or not disease:
+        #     return Response({"error": "Farm name and disease are required"}, status=status.HTTP_400_BAD_REQUEST)
 
-        DiseaseLog.objects.filter(farmName=farm_name, disease=disease, timestamp=timestamp).delete()
+        DiseaseLog.objects.get(id=diseaseID).delete()
 
-        return Response({"message": "Disease log deleted successfully"}, status=status.HTTP_200_OK)
+        response = Response({"message": "Disease log deleted successfully"},
+                            status=status.HTTP_200_OK)
+        response['Authorization'] = 'Bearer ' + auth_token
+
+        return response

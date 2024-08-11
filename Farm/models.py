@@ -12,4 +12,4 @@ class FarmProfile(models.Model):
         db_table = 'FarmProfile'
 
     def __str__(self):
-        return f"{self.farmID} - {self.cropName}"
+        return f"{self.farmName} - {self.cropName}"
