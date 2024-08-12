@@ -1,9 +1,8 @@
 from django.urls import path
 
-from SodamteoBack.Manage.views import Aircon, Humid, Co2, GetFarm
+from SodamteoBack.Manage.views import Aircon, Humid, Co2
 
 urlpatterns = [
-    path('check/', GetFarm.as_view(), name='check_farm'),
 
     path('check/device/aircon', Aircon.as_view(), name='get_airconditioner'),
     path('check/device/humid', Humid.as_view(), name='get_humidifier'),

@@ -8,12 +8,6 @@ from SodamteoBack import Manage
 from SodamteoBack.CropSelection.views import CropSelection
 
 # Create your views here.
-class GetFarm(APIView):
-    def get(self, request):
-        farmName = request.data.get('farName')
-        farm_status = CropSelection.objects.get(farmId=farmName)
-        serializer = FarmSerializer(farm_status)
-        return Response(serializer.data)
 
 class Aircon(APIView):
     def get(self, request):
