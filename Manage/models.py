@@ -1,9 +1,9 @@
 from django.db import models
 from CropSelection.models import FarmEnvironment
-from Farm.models import FarmID
+from Farm.models import Farm
 
 class Device(models.Model):
-    farmName = models.ForeignKey(FarmID, on_delete=models.CASCADE)
+    farmName = models.ForeignKey(Farm, on_delete=models.CASCADE)
     device = models.CharField(max_length=10)
     status = models.FloatField()
 
