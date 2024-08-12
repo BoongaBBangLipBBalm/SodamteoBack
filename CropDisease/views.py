@@ -5,11 +5,14 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from Farm.models import FarmProfile
 from Sodamteo import settings
 from .models import DiseaseLog
 from .detect_disease import detect_disease
 
 import os
+
+from .serializers import DiseaseSerializer
 
 SECRET_KEY = settings.SECRET_KEY
 
@@ -23,6 +26,11 @@ class DiseaseDetection(APIView):
         payload = jwt.decode(auth_token, SECRET_KEY, algorithms='HS256')
 
         farmID = payload['farmID']
+
+        try:
+            farm = FarmProfile.objects.get(farmID=farmID)
+        except FarmProfile.DoesNotExist:
+            return Response({"error": "No Farm Profile"}, status=status.HTTP_404_NOT_FOUND)
 
         # 이미지 파일을 입력 받음
         image_file = request.FILES.get('image')
@@ -38,7 +46,7 @@ class DiseaseDetection(APIView):
         # 질병 탐지
         disease, confidence = detect_disease(temp_image_path)
 
-        DiseaseLog.objects.create(farmId=farmID, disease=disease, confidence=confidence)
+        DiseaseLog.objects.create(farmID=farm, disease=disease, confidence=confidence)
 
         # 임시 파일 삭제
         os.remove(temp_image_path)
@@ -66,11 +74,12 @@ class GetFarmDisease(APIView):
 
         diseases = DiseaseLog.objects.filter(farmID=farmID)
 
-        result = [{"timestamp": disease['timestamp'],
-                   "disease": disease['disease'],
-                   "confidence": disease['confidence']} for disease in diseases]
+        serializerList = []
+        for disease in diseases:
+            serializer = DiseaseSerializer(disease)
+            serializerList.append(serializer.data)
 
-        response = Response({"diseases": result}, status=status.HTTP_200_OK)
+        response = Response(serializerList, status=status.HTTP_200_OK)
         response['Authorization'] = 'Bearer ' + auth_token
 
         return response
@@ -81,14 +90,8 @@ class DeleteDiseaseLog(APIView):
     질병 로그 삭제
     """
     def delete(self, request):
-        # farm_name = request.data.get('farmName')
-        # disease = request.data.get('disease')
-        # timestamp = request.data.get('timestamp')
         auth_token = request.headers.get('Authorization', None).replace('Bearer ', '')
-        diseaseID = request.data.get('diseasesID')
-
-        # if not farm_name or not disease:
-        #     return Response({"error": "Farm name and disease are required"}, status=status.HTTP_400_BAD_REQUEST)
+        diseaseID = request.data.get('diseaseID')
 
         DiseaseLog.objects.get(id=diseaseID).delete()
 

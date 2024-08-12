@@ -1,6 +1,6 @@
 from django.http import JsonResponse
 
-from .price_perdict import price_prediction
+from .price_predict import price_prediction
 
 
 def run_price_prediction_view(request):
