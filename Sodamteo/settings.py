@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     "CropDisease",
     "PricePrediction",
     "CropSelection",
+    "Manage",
 ]
 
 MIDDLEWARE = [
