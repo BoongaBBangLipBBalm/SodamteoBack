@@ -1,81 +1,120 @@
+import jwt
 from django.shortcuts import render
 from rest_framework.response import Response
-from rest_framework.response import status
+from rest_framework import status
 from rest_framework.views import APIView
 from Farm.serializers import FarmSerializer
 
-from SodamteoBack import Manage
-from SodamteoBack.CropSelection.views import CropSelection
+from .models import Device
+from Sodamteo import settings
 
-# Create your views here.
 
-class Aircon(APIView):
+class Airconditioner(APIView):
+    def post(self, request):
+        auth_token = request.header.get('Authorization').replace('Bearer ', '')
+        payload = jwt.decode(auth_token, settings.SECRET_KEY, algorithms=['HS256'])
+        farmID = payload['farmID']
+
+        device = request.data.get('device')
+        targetValue = request.get.data('targetValue')
+
+        deviceStatus = Device.objects.get(farmID=farmID, deviceID=device)
+
+        if deviceStatus:
+            deviceStatus.status = targetValue
+            deviceStatus.save()
+        else:
+            deviceStatus = Device.objects.create(farmID=farmID, deviceID=device, status=targetValue)
+
+        serializer = FarmSerializer(deviceStatus)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
     def get(self, request):
-        farmName = request.data.get('farName')
+        auth_token = request.header.get('Authorization').replace('Bearer ', '')
+        payload = jwt.decode(auth_token, settings.SECRET_KEY, algorithms=['HS256'])
+        farmID = payload['farmID']
+
         device = request.data.get('device')
 
         try:
-            device_status = Manage.objects.get(farmName=farmName, device=device)
-        except Manage.DoesNotExist:
-            return Response({"error": "can't find Airconditioner status"}, status=status.HTTP_404_NOT_FOUND)
+            deviceStatus = Device.objects.get(farmID=farmID, deviceID=device)
+        except Exception as e:
+            return Response({"error": "No airconditioner status"}, status=status.HTTP_404_NOT_FOUND)
 
-        serializer = FarmSerializer(device_status)
+        serializer = FarmSerializer(deviceStatus)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def patch(self, request):
-        farmName = request.data.get('farmName')
+
+class Humidifier(APIView):
+    def post(self, request):
+        auth_token = request.header.get('Authorization').replace('Bearer ', '')
+        payload = jwt.decode(auth_token, settings.SECRET_KEY, algorithms=['HS256'])
+        farmID = payload['farmID']
+
         device = request.data.get('device')
-        temp_opt = request.get.data('tempOpt')
-        manage = Manage.objects.get(farmName='farmName', device='device')
-        serializer = FarmSerializer(manage)
-        manage.status = temp_opt
-        manage.save()
+        targetValue = request.get.data('targetValue')
+
+        deviceStatus = Device.objects.get(farmID=farmID, deviceID=device)
+
+        if deviceStatus:
+            deviceStatus.status = targetValue
+            deviceStatus.save()
+        else:
+            deviceStatus = Device.objects.create(farmID=farmID, deviceID=device, status=targetValue)
+
+        serializer = FarmSerializer(deviceStatus)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-class Humid(APIView):
     def get(self, request):
-        farmName = request.data.get('farName')
+        auth_token = request.header.get('Authorization').replace('Bearer ', '')
+        payload = jwt.decode(auth_token, settings.SECRET_KEY, algorithms=['HS256'])
+        farmID = payload['farmID']
+
         device = request.data.get('device')
 
         try:
-            device_status = Manage.objects.get(farmName=farmName, device=device)
-        except Manage.DoesNotExist:
-            return Response({"error": "can't find Humidifier status"}, status=status.HTTP_404_NOT_FOUND)
+            deviceStatus = Device.objects.get(farmID=farmID, deviceID=device)
+        except Exception as e:
+            return Response({"error": "No airconditioner status"}, status=status.HTTP_404_NOT_FOUND)
 
-        serializer = FarmSerializer(device_status)
+        serializer = FarmSerializer(deviceStatus)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-    def patch(self, request):
-        farmName = request.data.get('farName')
+class CO2(APIView):
+    def post(self, request):
+        auth_token = request.header.get('Authorization').replace('Bearer ', '')
+        payload = jwt.decode(auth_token, settings.SECRET_KEY, algorithms=['HS256'])
+        farmID = payload['farmID']
+
         device = request.data.get('device')
-        humid_opt = request.data.get('humidOpt')
-        manage = Manage.objects.get(farmName='farmName',device='device')
-        serializer = FarmSerializer(manage)
-        manage.status = humid_opt
-        manage.save()
+        targetValue = request.get.data('targetValue')
+
+        deviceStatus = Device.objects.get(farmID=farmID, deviceID=device)
+
+        if deviceStatus:
+            deviceStatus.status = targetValue
+            deviceStatus.save()
+        else:
+            deviceStatus = Device.objects.create(farmID=farmID, deviceID=device, status=targetValue)
+
+        serializer = FarmSerializer(deviceStatus)
+
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-class Co2(APIView):
     def get(self, request):
-        farmName = request.data.get('farName')
+        auth_token = request.header.get('Authorization').replace('Bearer ', '')
+        payload = jwt.decode(auth_token, settings.SECRET_KEY, algorithms=['HS256'])
+        farmID = payload['farmID']
+
         device = request.data.get('device')
 
         try:
-            device_status = Manage.objects.get(farmName=farmName, device=device)
-        except Manage.DoesNotExist:
-            return Response({"error": "can't find Co2 status"}, status=status.HTTP_404_NOT_FOUND)
+            deviceStatus = Device.objects.get(farmID=farmID, deviceID=device)
+        except Exception as e:
+            return Response({"error": "No airconditioner status"}, status=status.HTTP_404_NOT_FOUND)
 
-        serializer = FarmSerializer(device_status)
+        serializer = FarmSerializer(deviceStatus)
         return Response(serializer.data, status=status.HTTP_200_OK)
-
-    def patch(self,request):
-        farmName = request.data.get('farName')
-        device = request.data.get('device')
-        co2_opt = request.data.get('co2Opt')
-        manage = Manage.objects.get(farmName='farmName',device='device')
-        serializer = FarmSerializer(manage)
-        manage.status = co2_opt
-        manage.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)

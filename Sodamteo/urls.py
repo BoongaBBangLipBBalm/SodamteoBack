@@ -26,4 +26,5 @@ urlpatterns = [
     path('disease/', include('CropDisease.urls')),
     path('price/', include('PricePrediction.urls')),
     path('environment/', include('CropSelection.urls')),
+    path('hardware/', include('Manage.urls')),
 ]
