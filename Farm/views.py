@@ -140,7 +140,9 @@ class UpdateFarm(APIView):
             return Response({"error": "can't find farm"}, status=status.HTTP_404_NOT_FOUND)
 
         farm.cropName = new_crop
-        farm.farmName = newFarmName
+        if newFarmName:
+            farm.farmName = newFarmName
+
         farm.save()
 
         serializer = FarmSerializer(farm)

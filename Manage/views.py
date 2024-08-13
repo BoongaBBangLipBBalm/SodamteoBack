@@ -11,34 +11,36 @@ from Sodamteo import settings
 
 class Airconditioner(APIView):
     def post(self, request):
-        auth_token = request.header.get('Authorization').replace('Bearer ', '')
-        payload = jwt.decode(auth_token, settings.SECRET_KEY, algorithms=['HS256'])
+        auth_token = request.headers.get('Authorization', None).replace('Bearer ', '')
+        payload = jwt.decode(auth_token, settings.SECRET_KEY, algorithms='HS256')
         farmID = payload['farmID']
 
         device = request.data.get('device')
-        targetValue = request.get.data('targetValue')
+        targetValue = request.data.get('targetValue')
 
-        deviceStatus = Device.objects.get(farmID=farmID, deviceID=device)
+        deviceStatus, created = Device.objects.get_or_create(
+            farmID=farmID,
+            device=device,
+            defaults={'status': targetValue}
+        )
 
-        if deviceStatus:
+        if not created:
             deviceStatus.status = targetValue
             deviceStatus.save()
-        else:
-            deviceStatus = Device.objects.create(farmID=farmID, deviceID=device, status=targetValue)
 
         serializer = FarmSerializer(deviceStatus)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def get(self, request):
-        auth_token = request.header.get('Authorization').replace('Bearer ', '')
-        payload = jwt.decode(auth_token, settings.SECRET_KEY, algorithms=['HS256'])
+        auth_token = request.headers.get('Authorization', None).replace('Bearer ', '')
+        payload = jwt.decode(auth_token, settings.SECRET_KEY, algorithms='HS256')
         farmID = payload['farmID']
 
         device = request.data.get('device')
 
         try:
-            deviceStatus = Device.objects.get(farmID=farmID, deviceID=device)
+            deviceStatus = Device.objects.get(farmID=farmID, device=device)
         except Exception as e:
             return Response({"error": "No airconditioner status"}, status=status.HTTP_404_NOT_FOUND)
 
@@ -48,34 +50,36 @@ class Airconditioner(APIView):
 
 class Humidifier(APIView):
     def post(self, request):
-        auth_token = request.header.get('Authorization').replace('Bearer ', '')
-        payload = jwt.decode(auth_token, settings.SECRET_KEY, algorithms=['HS256'])
+        auth_token = request.headers.get('Authorization', None).replace('Bearer ', '')
+        payload = jwt.decode(auth_token, settings.SECRET_KEY, algorithms='HS256')
         farmID = payload['farmID']
 
         device = request.data.get('device')
-        targetValue = request.get.data('targetValue')
+        targetValue = request.data.get('targetValue')
 
-        deviceStatus = Device.objects.get(farmID=farmID, deviceID=device)
+        deviceStatus, created = Device.objects.get_or_create(
+            farmID=farmID,
+            device=device,
+            defaults={'status': targetValue}
+        )
 
-        if deviceStatus:
+        if not created:
             deviceStatus.status = targetValue
             deviceStatus.save()
-        else:
-            deviceStatus = Device.objects.create(farmID=farmID, deviceID=device, status=targetValue)
 
         serializer = FarmSerializer(deviceStatus)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def get(self, request):
-        auth_token = request.header.get('Authorization').replace('Bearer ', '')
-        payload = jwt.decode(auth_token, settings.SECRET_KEY, algorithms=['HS256'])
+        auth_token = request.headers.get('Authorization', None).replace('Bearer ', '')
+        payload = jwt.decode(auth_token, settings.SECRET_KEY, algorithms='HS256')
         farmID = payload['farmID']
 
         device = request.data.get('device')
 
         try:
-            deviceStatus = Device.objects.get(farmID=farmID, deviceID=device)
+            deviceStatus = Device.objects.get(farmID=farmID, device=device)
         except Exception as e:
             return Response({"error": "No airconditioner status"}, status=status.HTTP_404_NOT_FOUND)
 
@@ -85,34 +89,35 @@ class Humidifier(APIView):
 
 class CO2(APIView):
     def post(self, request):
-        auth_token = request.header.get('Authorization').replace('Bearer ', '')
-        payload = jwt.decode(auth_token, settings.SECRET_KEY, algorithms=['HS256'])
+        auth_token = request.headers.get('Authorization', None).replace('Bearer ', '')
+        payload = jwt.decode(auth_token, settings.SECRET_KEY, algorithms='HS256')
         farmID = payload['farmID']
 
         device = request.data.get('device')
-        targetValue = request.get.data('targetValue')
+        targetValue = request.data.get('targetValue')
 
-        deviceStatus = Device.objects.get(farmID=farmID, deviceID=device)
-
-        if deviceStatus:
+        deviceStatus, created = Device.objects.get_or_create(
+            farmID=farmID,
+            device=device,
+            defaults={'status': targetValue}
+        )
+        if not created:
             deviceStatus.status = targetValue
             deviceStatus.save()
-        else:
-            deviceStatus = Device.objects.create(farmID=farmID, deviceID=device, status=targetValue)
 
         serializer = FarmSerializer(deviceStatus)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def get(self, request):
-        auth_token = request.header.get('Authorization').replace('Bearer ', '')
-        payload = jwt.decode(auth_token, settings.SECRET_KEY, algorithms=['HS256'])
+        auth_token = request.headers.get('Authorization', None).replace('Bearer ', '')
+        payload = jwt.decode(auth_token, settings.SECRET_KEY, algorithms='HS256')
         farmID = payload['farmID']
 
         device = request.data.get('device')
 
         try:
-            deviceStatus = Device.objects.get(farmID=farmID, deviceID=device)
+            deviceStatus = Device.objects.get(farmID=farmID, device=device)
         except Exception as e:
             return Response({"error": "No airconditioner status"}, status=status.HTTP_404_NOT_FOUND)
 
