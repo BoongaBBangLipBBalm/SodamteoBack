@@ -95,14 +95,15 @@ class GetFarm(APIView):
         payload = jwt.decode(auth_token, settings.SECRET_KEY, algorithms=['HS256'])
 
         userID = payload['id']
-        farmName = data.get('farmName')
+        # farmName = data.get('farmName')
+        farmID = data.get('farmID')
 
-        if not userID or not farmName:
+        if not userID or not farmID:
             return Response({"error": "Email and Farm Name are required"}, status=status.HTTP_400_BAD_REQUEST)
 
         # find farm
         try:
-            farm = FarmProfile.objects.get(userID=userID, farmName=farmName)
+            farm = FarmProfile.objects.get(farmID=farmID)
         except FarmProfile.DoesNotExist:
             return Response({"error": "No Farm Profile"}, status=status.HTTP_404_NOT_FOUND)
 
@@ -115,11 +116,12 @@ class GetFarm(APIView):
             'iat': payload['iat'],
             'jti': payload['jti'],
             'id': payload['id'],
-            'farmID': farm.farmID
+            'farmID': farmID
         }
         new_token = jwt.encode(new_payload, settings.SECRET_KEY, algorithm='HS256')
 
-        response = Response(serializer.data, status.HTTP_200_OK)
+        response = Response({"FarmInfo": serializer.data,
+                             "message": "New Token Arrived"}, status.HTTP_200_OK)
         response['Authorization'] = 'Bearer ' + new_token
 
         return response
@@ -163,7 +165,8 @@ class UpdateFarm(APIView):
         }
         new_token = jwt.encode(new_payload, settings.SECRET_KEY, algorithm='HS256')
 
-        response = Response(serializer.data, status.HTTP_200_OK)
+        response = Response({"FarmInfo": serializer.data,
+                             "message": "New Token Arrived"}, status.HTTP_200_OK)
         response['Authorization'] = 'Bearer ' + new_token
 
         return response
