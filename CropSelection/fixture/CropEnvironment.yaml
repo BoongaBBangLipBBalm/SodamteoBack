@@ -1,0 +1,33 @@
+- model: CropSelection.DefaultEnvironment
+  pk: 1
+  fields:
+    cropName: Apple
+    N: 20.80
+    P: 134.22
+    K: 199.89
+    temperature: 22.630942
+    humidity: 92.333383
+    ph: 5.929663
+    rainfall: 112.654779
+- model: CropSelection.DefaultEnvironment
+  pk: 2
+  fields:
+    cropName: Rice
+    N: 79.89
+    P: 47.58
+    K: 39.87
+    temperature: 23.689332
+    humidity: 82.272822
+    ph: 6.425471
+    rainfall: 236.181114
+- model: CropSelection.DefaultEnvironment
+  pk: 3
+  fields:
+    cropName: Corn
+    N: 77.76
+    P: 48.44
+    K: 19.79
+    temperature: 22.389204
+    humidity: 65.092249
+    ph: 6.245190
+    rainfall: 84.766988
