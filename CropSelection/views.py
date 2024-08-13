@@ -30,7 +30,12 @@ class CropSelection(APIView):
         ph = request.GET.get('ph')
         rainfall = request.GET.get('rainfall')
 
-        environment = FarmEnvironment.objects.create(farmID=farmID, N=N, P=P, K=K, temperature=temperature,
+        try:
+            farm = FarmProfile.objects.get(farmID=farmID)
+        except Exception as e:
+            return Response({'error': "No such farm"}, status=status.HTTP_404_NOT_FOUND)
+
+        environment = FarmEnvironment.objects.create(farmID=farm, N=N, P=P, K=K, temperature=temperature,
                                                      humidity=humidity, ph=ph, rainfall=rainfall)
         serializer = CurrEnvSerializer(environment)
 
@@ -58,7 +63,12 @@ class CropEnvironment(APIView):
         ph = request.data.get('ph')
         rainfall = request.data.get('rainfall')
 
-        FarmEnvironment.objects.create(farmID=farmID, N=N, P=P, K=K, temperature=temperature,
+        try:
+            farm = FarmProfile.objects.get(farmID=farmID)
+        except Exception as e:
+            return Response({'error': "No such farm"}, status=status.HTTP_404_NOT_FOUND)
+
+        FarmEnvironment.objects.create(farmID=farm, N=N, P=P, K=K, temperature=temperature,
                                        humidity=humidity, ph=ph, rainfall=rainfall)
 
         response = Response(status=status.HTTP_201_CREATED)
