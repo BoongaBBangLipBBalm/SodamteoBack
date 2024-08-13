@@ -3,10 +3,12 @@ from rest_framework import viewsets, permissions, status, generics
 from rest_framework.response import Response
 from rest_framework.views import APIView
 import jwt
+import json
 
 from Farm.models import FarmProfile
 from Farm.serializers import FarmSerializer
 from Users.models import User
+from Manage.models import Device
 
 from Sodamteo import settings
 
@@ -23,6 +25,7 @@ class CreateFarm(APIView):
 
         cropName = request.data.get('cropName')
         farmName = request.data.get('farmName')
+        devices = request.data.get('devices').strip('[]').replace(' ', '').split(',')
 
         # 2 find user
         try:
@@ -32,6 +35,9 @@ class CreateFarm(APIView):
 
         # 3 create farm
         farm = FarmProfile.objects.create(userID=userID, cropName=cropName, farmName=farmName)
+
+        for device in devices:
+            Device.objects.create(farmID=farm, device=device, status=0)
 
         serializer = FarmSerializer(farm)
 
