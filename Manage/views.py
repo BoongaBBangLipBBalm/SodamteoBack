@@ -87,7 +87,7 @@ class Humidifier(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class CO2(APIView):
+class Fertilizer(APIView):
     def post(self, request):
         auth_token = request.headers.get('Authorization', None).replace('Bearer ', '')
         payload = jwt.decode(auth_token, settings.SECRET_KEY, algorithms='HS256')
