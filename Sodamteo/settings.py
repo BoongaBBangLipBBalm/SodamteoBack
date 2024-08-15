@@ -30,7 +30,9 @@ environ.Env.read_env(
 SECRET_KEY = env('SECRET_KEY')  # SECERET_KEY 값 불러오기
 DEBUG = env('DEBUG')  # DEBUG 값 불러오기
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    ".ap-northeast-2.compute.amazonaws.com"
+]
 
 # Application definition
 
