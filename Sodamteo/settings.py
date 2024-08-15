@@ -30,7 +30,9 @@ environ.Env.read_env(
 SECRET_KEY = env('SECRET_KEY')  # SECERET_KEY 값 불러오기
 DEBUG = env('DEBUG')  # DEBUG 값 불러오기
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    ".ap-northeast-2.compute.amazonaws.com"
+]
 
 # Application definition
 
@@ -44,6 +46,7 @@ INSTALLED_APPS = [
 
     "rest_framework",
     "rest_framework_simplejwt",
+    "rest_framework_simplejwt.token_blacklist",
 
     "Users",
     "Farm",
@@ -160,6 +163,8 @@ SIMPLE_JWT = {
     'ISSUER': None,
     'JWK_URL': None,
     'LEEWAY': None,
+
+    'BLACKLIST_AFTER_ROTATION': True,
 
     'AUTH_HEADER_TYPES': ('Bearer',),
     'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',

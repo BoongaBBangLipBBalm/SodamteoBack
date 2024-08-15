@@ -77,6 +77,16 @@ class Login(APIView):
         return response
 
 
+class Logout(APIView):
+    def post(self, request):
+        token = request.data.get('RefreshToken')
+        refreshToken = RefreshToken(token)
+
+        refreshToken.blacklist()
+
+        return Response({'message': 'Logged out successfully'}, status=status.HTTP_200_OK)
+
+
 class CustomTokenObtainPairView(TokenObtainPairView):
     permission_classes = [AllowAny]
 
