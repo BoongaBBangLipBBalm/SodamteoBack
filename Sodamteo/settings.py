@@ -32,7 +32,7 @@ DEBUG = env('DEBUG')  # DEBUG 값 불러오기
 
 ALLOWED_HOSTS = [
     ".ap-northeast-2.compute.amazonaws.com",
-    ".sodam.store"
+    ".sodam.store",
 ]
 
 # Application definition
