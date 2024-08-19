@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "corsheaders",
 
     "rest_framework",
     "rest_framework_simplejwt",
@@ -57,6 +58,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -178,3 +180,19 @@ SIMPLE_JWT = {
 }
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+CORS_ORIGIN_ALLOW_ALL = True
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    'http://localhost:8000',
+    'http://0.0.0.0:8000',
+    'http://0.0.0.0:3000',
+]
+
+CORS_ORIGIN_WHITELIST = [
+    "http://localhost:3000",
+    'http://localhost:8000',
+    "http://0.0.0.0:3000",
+    'http://0.0.0.0:8000',
+]
