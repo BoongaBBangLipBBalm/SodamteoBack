@@ -29,11 +29,13 @@ environ.Env.read_env(
 
 SECRET_KEY = env('SECRET_KEY')  # SECERET_KEY 값 불러오기
 DEBUG = env('DEBUG')  # DEBUG 값 불러오기
+privateip = env('PRIVATE_IPv4')
 
 ALLOWED_HOSTS = [
     ".ap-northeast-2.compute.amazonaws.com",
     ".sodam.store",
     "127.0.0.1",
+    privateip,
 ]
 
 # Application definition
