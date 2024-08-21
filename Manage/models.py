@@ -6,6 +6,7 @@ class Device(models.Model):
     farmID = models.ForeignKey(FarmProfile, on_delete=models.CASCADE, related_name='farm_devices')
     device = models.CharField(max_length=100)
     status = models.FloatField()
+    isAuto = models.BooleanField(default=False)
 
     class Meta:
         db_table = 'Device'

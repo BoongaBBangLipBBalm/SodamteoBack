@@ -1,9 +1,11 @@
 import jwt
+import yaml
 from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
 
+from CropSelection.models import DefaultEnvironment
 from .models import Device
 from .serializers import DeviceSerializer
 from Farm.models import FarmProfile
@@ -83,3 +85,43 @@ class DeviceManager(APIView):
         response['Authorization'] = 'Bearer ' + auth_token
 
         return response
+
+class autoManage(APIView):
+    def patch(self, request):
+        auth_token = request.headers.get('Authorization', None).replace('Bearer ', '')
+        payload = jwt.decode(auth_token, settings.SECRET_KEY, algorithms='HS256')
+        farmID = payload['farmID']
+        device = request.data.get('device')
+        auto = request.data.get('isAuto')
+
+        try:
+            deviceStatus = Device.objects.get(farmID=farmID, device=device)
+        except Exception as e:
+            return Response({"error": f"No {device} status"}, status=status.HTTP_404_NOT_FOUND)
+
+        if auto:
+            crop = FarmProfile.objects.get(farmID=farmID).cropName
+            default = DefaultEnvironment.objects.filter(cropName=crop).first()
+
+            if not default:
+                return Response({"error": "Default environment settings not found for this crop"},
+                                status=status.HTTP_404_NOT_FOUND)
+
+            if device == "Airconditioner":
+                new_status = default.temperature
+            elif device == "Humidifier":
+                new_status = default.humidity
+            elif device == "Fertilizer":
+                # N, P, K, pH의 평균값 계산
+                new_status = (default.N + default.P + default.K + default.ph) / 4
+            else:
+                return Response({"error": "Unsupported device"}, status=status.HTTP_400_BAD_REQUEST)
+
+            deviceStatus.status = new_status
+            deviceStatus.isAuto = auto
+            deviceStatus.save()
+            return Response({"message": "Device updated successfully"}, status=status.HTTP_200_OK)
+        else:
+            deviceStatus.isAuto = auto
+            deviceStatus.save()
+            return Response({"message": "Auto mode disabled"}, status=status.HTTP_200_OK)

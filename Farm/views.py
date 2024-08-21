@@ -139,7 +139,6 @@ class UpdateFarm(APIView):
 
         farmID = payload['farmID']
 
-        new_crop = request.data.get('newCrop')
         newFarmName = request.data.get('newFarmName')
 
         try:
@@ -147,7 +146,6 @@ class UpdateFarm(APIView):
         except FarmProfile.DoesNotExist:
             return Response({"error": "can't find farm"}, status=status.HTTP_404_NOT_FOUND)
 
-        farm.cropName = new_crop
         if newFarmName:
             farm.farmName = newFarmName
 
