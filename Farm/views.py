@@ -8,6 +8,7 @@ import json
 from CropSelection.serializers import CurrEnvSerializer
 from Farm.models import FarmProfile
 from Farm.serializers import AllFarmSerializer, SingleFarmSerializer, OnlyProfileSerializer
+from Manage.serializers import DeviceSerializer
 from Users.models import User
 from Manage.models import Device
 
@@ -122,6 +123,12 @@ class GetFarm(APIView):
         #     cnt += 1
         #     if cnt == 5: break
 
+        devices = farm.farm_devices.all()
+        if devices:
+            deviceSerializers = DeviceSerializer(devices, many=True).data
+        else:
+            deviceSerializers = "No Devices Yet"
+
         new_payload = {
             'token_type': payload['token_type'],
             'exp': payload['exp'],
@@ -132,7 +139,7 @@ class GetFarm(APIView):
         }
         new_token = jwt.encode(new_payload, settings.SECRET_KEY, algorithm='HS256')
 
-        response = Response({"FarmInfo": serializer.data, "environment": currEnvSerializers,
+        response = Response({"FarmInfo": serializer.data, "environment": currEnvSerializers, "device": deviceSerializers,
                              "message": "New Token Arrived"}, status.HTTP_200_OK)
         response['Authorization'] = new_token
 
