@@ -212,7 +212,7 @@ class DeleteFarm(APIView):
         }
         new_token = jwt.encode(new_payload, settings.SECRET_KEY, algorithm='HS256')
 
-        response = Response({"message: Deleted Successfully"}, status.HTTP_200_OK)
+        response = Response({"message": "Deleted Successfully and New Token Arrived"}, status.HTTP_200_OK)
         response['Authorization'] = new_token
 
         return response
