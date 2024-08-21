@@ -49,7 +49,10 @@ class CropSelection(APIView):
         probs = results[0][sorted_indices]
         crops = model.classes_[sorted_indices]
 
-        return Response({'crops': crops, 'probs': probs, 'init_env': serializer}, status=status.HTTP_201_CREATED)
+        response = Response({'crops': crops, 'probs': probs, 'init_env': serializer}, status=status.HTTP_201_CREATED)
+        response['Authorization'] = auth_token
+
+        return response
 
 
 class CropEnvironment(APIView):
@@ -75,7 +78,7 @@ class CropEnvironment(APIView):
                                        humidity=humidity, ph=ph, rainfall=rainfall)
 
         response = Response(status=status.HTTP_201_CREATED)
-        response['Authorization'] = 'Bearer ' + auth_token
+        response['Authorization'] = auth_token
 
         return response
 
@@ -111,6 +114,6 @@ class CropEnvironment(APIView):
 
         response = Response({"Current": currEnvSerializers,
                              "Opt": optEnvSerializer.data}, status.HTTP_200_OK)
-        response['Authorization'] = 'Bearer ' + auth_token
+        response['Authorization'] = auth_token
 
         return response

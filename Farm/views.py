@@ -134,7 +134,7 @@ class GetFarm(APIView):
 
         response = Response({"FarmInfo": serializer.data, "environment": currEnvSerializers,
                              "message": "New Token Arrived"}, status.HTTP_200_OK)
-        response['Authorization'] = 'Bearer ' + new_token
+        response['Authorization'] = new_token
 
         return response
 
@@ -178,7 +178,7 @@ class UpdateFarm(APIView):
 
         response = Response({"FarmInfo": serializer.data,
                              "message": "New Token Arrived"}, status.HTTP_200_OK)
-        response['Authorization'] = 'Bearer ' + new_token
+        response['Authorization'] = new_token
 
         return response
 
@@ -213,6 +213,6 @@ class DeleteFarm(APIView):
         new_token = jwt.encode(new_payload, settings.SECRET_KEY, algorithm='HS256')
 
         response = Response({"message: Deleted Successfully"}, status.HTTP_200_OK)
-        response['Authorization'] = 'Bearer ' + new_token
+        response['Authorization'] = new_token
 
         return response
