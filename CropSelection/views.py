@@ -16,8 +16,6 @@ import joblib
 import sklearn
 import numpy as np
 
-from media.false import curr5Env
-
 
 class CropSelection(APIView):
     def post(self, request):
@@ -111,9 +109,7 @@ class CropEnvironment(APIView):
 
         optEnvSerializer = OptEnvSerializer(defEnv)
 
-        falseSerializers = curr5Env(farmID) ##############
-
-        response = Response({"Current": falseSerializers, # currEnvSerializers,
+        response = Response({"Current": currEnvSerializers,
                              "Opt": optEnvSerializer.data}, status.HTTP_200_OK)
         response['Authorization'] = 'Bearer ' + auth_token
 

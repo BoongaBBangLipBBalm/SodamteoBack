@@ -5,12 +5,14 @@ from rest_framework.views import APIView
 import jwt
 import json
 
+from CropSelection.serializers import CurrEnvSerializer
 from Farm.models import FarmProfile
-from Farm.serializers import FarmSerializer
+from Farm.serializers import AllFarmSerializer, SingleFarmSerializer, OnlyProfileSerializer
 from Users.models import User
 from Manage.models import Device
 
 from Sodamteo import settings
+from media.false import saveFalseData
 
 
 class CreateFarm(APIView):
@@ -39,7 +41,7 @@ class CreateFarm(APIView):
         for device in devices:
             Device.objects.create(farmID=farm, device=device, status=0)
 
-        serializer = FarmSerializer(farm)
+        serializer = AllFarmSerializer(farm)
 
         new_payload = {
             'token_type': payload['token_type'],
@@ -74,7 +76,7 @@ class GetFarmList(APIView):
 
         serializerList = []
         for farm in farmList:
-            serializer = FarmSerializer(farm)
+            serializer = AllFarmSerializer(farm)
             serializerList.append(serializer.data)
 
         response = Response(serializerList, status.HTTP_200_OK)
@@ -95,7 +97,6 @@ class GetFarm(APIView):
         payload = jwt.decode(auth_token, settings.SECRET_KEY, algorithms=['HS256'])
 
         userID = payload['id']
-        # farmName = data.get('farmName')
         farmID = data.get('farmID')
 
         if not userID or not farmID:
@@ -108,7 +109,18 @@ class GetFarm(APIView):
             return Response({"error": "No Farm Profile"}, status=status.HTTP_404_NOT_FOUND)
 
         # 4 serialize
-        serializer = FarmSerializer(farm)
+        serializer = OnlyProfileSerializer(farm)
+
+        currEnvSerializers = saveFalseData(farmID) #######################################################################
+        # 위 코드는 가짜로 생성한 데이터를 받아오는 것이므로 실제로는 아래 코드를 실행해야 함
+        # environmentList = farm.farm_environment.all()
+        # currEnvSerializers = []
+        # cnt = 0
+        # for environment in environmentList:
+        #     currEnv = CurrEnvSerializer(environment)
+        #     currEnvSerializers.append(currEnv.data)
+        #     cnt += 1
+        #     if cnt == 5: break
 
         new_payload = {
             'token_type': payload['token_type'],
@@ -120,7 +132,7 @@ class GetFarm(APIView):
         }
         new_token = jwt.encode(new_payload, settings.SECRET_KEY, algorithm='HS256')
 
-        response = Response({"FarmInfo": serializer.data,
+        response = Response({"FarmInfo": serializer.data, "environment": currEnvSerializers,
                              "message": "New Token Arrived"}, status.HTTP_200_OK)
         response['Authorization'] = 'Bearer ' + new_token
 
@@ -131,7 +143,6 @@ class UpdateFarm(APIView):
     """
     농장 수정
     """
-
     def patch(self, request):
         # 1 input data
         token = request.headers.get('Authorization', None).replace('Bearer ', '')
@@ -153,7 +164,7 @@ class UpdateFarm(APIView):
 
         farm.save()
 
-        serializer = FarmSerializer(farm)
+        serializer = SingleFarmSerializer(farm)
 
         new_payload = {
             'token_type': payload['token_type'],
@@ -176,7 +187,6 @@ class DeleteFarm(APIView):
     """
     농장 삭제
     """
-
     def delete(self, request):
         # 1 input data
         token = request.headers.get('Authorization', None).replace('Bearer ', '')
