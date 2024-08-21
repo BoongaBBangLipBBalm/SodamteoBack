@@ -38,7 +38,7 @@ class DeviceManager(APIView):
         serializer = DeviceSerializer(deviceStatus)
 
         response = Response(serializer.data, status=status.HTTP_200_OK)
-        response['Authorization'] = 'Bearer ' + auth_token
+        response['Authorization'] = auth_token
 
         return response
 
@@ -46,8 +46,6 @@ class DeviceManager(APIView):
         auth_token = request.headers.get('Authorization', None).replace('Bearer ', '')
         payload = jwt.decode(auth_token, settings.SECRET_KEY, algorithms='HS256')
         farmID = payload['farmID']
-
-        device = request.data.get('device')
 
         try:
             deviceStatus = Device.objects.filter(farmID=farmID)
@@ -60,7 +58,7 @@ class DeviceManager(APIView):
             serializerList.append(serializer.data)
 
         response = Response(serializerList, status=status.HTTP_200_OK)
-        response['Authorization'] = 'Bearer ' + auth_token
+        response['Authorization'] = auth_token
 
         return response
 
@@ -82,7 +80,7 @@ class DeviceManager(APIView):
         serializer = DeviceSerializer(deviceStatus)
 
         response = Response(serializer.data, status=status.HTTP_200_OK)
-        response['Authorization'] = 'Bearer ' + auth_token
+        response['Authorization'] = auth_token
 
         return response
 

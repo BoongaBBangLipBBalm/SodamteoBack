@@ -36,6 +36,7 @@ ALLOWED_HOSTS = [
     ".sodam.store",
     "127.0.0.1",
     privateip,
+    "localhost",
 ]
 
 # Application definition

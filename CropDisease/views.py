@@ -57,7 +57,7 @@ class DiseaseDetection(APIView):
             "message": "Successful Disease Detection"
         }, status=status.HTTP_201_CREATED)
 
-        response['Authorization'] = 'Bearer ' + auth_token
+        response['Authorization'] = auth_token
 
         return response
 
@@ -80,7 +80,7 @@ class GetFarmDisease(APIView):
             serializerList.append(serializer.data)
 
         response = Response(serializerList, status=status.HTTP_200_OK)
-        response['Authorization'] = 'Bearer ' + auth_token
+        response['Authorization'] = auth_token
 
         return response
 
@@ -97,6 +97,6 @@ class DeleteDiseaseLog(APIView):
 
         response = Response({"message": "Disease log deleted successfully"},
                             status=status.HTTP_200_OK)
-        response['Authorization'] = 'Bearer ' + auth_token
+        response['Authorization'] = auth_token
 
         return response
