@@ -26,13 +26,10 @@ class DeviceManager(APIView):
         except Exception as e:
             return Response({"error": 'Farm not found'}, status=status.HTTP_404_NOT_FOUND)
 
-        deviceStatus, created = Device.objects.get_or_create(
-            farmID=farm,
-            device=device,
-            status=0.
-        )
-
-        if not created:
+        exist = farm.farm_devices.filter(device=device)
+        if not exist:
+            deviceStatus = Device.objects.create(farmID=farm, device=device, status=0.)
+        else:
             return Response({"message": "Device already exists"}, status=status.HTTP_400_BAD_REQUEST)
 
         serializer = DeviceSerializer(deviceStatus)
@@ -84,6 +81,7 @@ class DeviceManager(APIView):
 
         return response
 
+
 class autoManage(APIView):
     def patch(self, request):
         auth_token = request.headers.get('Authorization', None).replace('Bearer ', '')
@@ -118,8 +116,12 @@ class autoManage(APIView):
             deviceStatus.status = new_status
             deviceStatus.isAuto = auto
             deviceStatus.save()
-            return Response({"message": "Device updated successfully"}, status=status.HTTP_200_OK)
+            deviceSerializer = DeviceSerializer(deviceStatus)
+            return Response({"message": "Device updated successfully",
+                             "device": deviceSerializer.data}, status=status.HTTP_200_OK)
         else:
             deviceStatus.isAuto = auto
             deviceStatus.save()
-            return Response({"message": "Auto mode disabled"}, status=status.HTTP_200_OK)
+            deviceSerializer = DeviceSerializer(deviceStatus)
+            return Response({"message": "Auto mode disabled",
+                             "device": deviceSerializer}, status=status.HTTP_200_OK)

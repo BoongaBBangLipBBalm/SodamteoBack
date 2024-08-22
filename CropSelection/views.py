@@ -25,22 +25,22 @@ class CropSelection(APIView):
         payload = jwt.decode(auth_token, settings.SECRET_KEY, algorithms=['HS256'])
         farmID = payload['farmID']
 
-        N = request.GET.get('N')
-        P = request.GET.get('P')
-        K = request.GET.get('K')
-        temperature = request.GET.get('temperature')
-        humidity = request.GET.get('humidity')
-        ph = request.GET.get('ph')
-        rainfall = request.GET.get('rainfall')
+        N = float(request.data.get('N'))
+        P = float(request.data.get('P'))
+        K = float(request.data.get('K'))
+        temperature = float(request.data.get('temperature'))
+        humidity = float(request.data.get('humidity'))
+        ph = float(request.data.get('ph'))
+        rainfall = float(request.data.get('rainfall'))
 
-        try:
-            farm = FarmProfile.objects.get(farmID=farmID)
-        except Exception as e:
-            return Response({'error': "No such farm"}, status=status.HTTP_404_NOT_FOUND)
+        # try:
+        #     farm = FarmProfile.objects.get(farmID=farmID)
+        # except Exception as e:
+        #     return Response({'error': "No such farm"}, status=status.HTTP_404_NOT_FOUND)
 
-        environment = FarmEnvironment.objects.create(farmID=farm, N=N, P=P, K=K, temperature=temperature,
-                                                     humidity=humidity, ph=ph, rainfall=rainfall)
-        serializer = CurrEnvSerializer(environment)
+        # environment = FarmEnvironment.objects.create(farmID=farm, N=N, P=P, K=K, temperature=temperature,
+        #                                              humidity=humidity, ph=ph, rainfall=rainfall)
+        # serializer = CurrEnvSerializer(environment)
 
         results = model.predict_proba([[N, P, K, temperature, humidity, ph, rainfall]])
 
@@ -49,7 +49,12 @@ class CropSelection(APIView):
         probs = results[0][sorted_indices]
         crops = model.classes_[sorted_indices]
 
-        response = Response({'crops': crops, 'probs': probs, 'init_env': serializer}, status=status.HTTP_201_CREATED)
+        data = {}
+        for c, p in zip(crops, probs):
+            data[c] = p
+
+        # response = Response({'crops': crops, 'probs': probs, 'init_env': serializer}, status=status.HTTP_201_CREATED)
+        response = Response(data, status=status.HTTP_201_CREATED)
         response['Authorization'] = auth_token
 
         return response
