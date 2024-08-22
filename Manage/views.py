@@ -85,6 +85,23 @@ class DeviceManager(APIView):
         response['Authorization'] = 'Bearer ' + auth_token
 
         return response
+    def delete(self, request):
+        auth_token = request.headers.get('Authorization', None).replace('Bearer ', '')
+        payload = jwt.decode(auth_token, settings.SECRET_KEY, algorithms='HS256')
+        farmID = payload['farmID']
+
+        device = request.data.get('device')
+
+        try:
+            deviceStatus = Device.objects.filter(farmID=farmID)
+        except Exception as e:
+            return Response({"error": "Device status does not exist "}, status=status.HTTP_404_NOT_FOUND)
+
+        deviceStatus.delete()
+        serializer = DeviceSerializer(deviceStatus)
+        response = Response(serializer.data, status=status.HTTP_200_OK)
+        response['Authorization'] = 'Bearer ' + auth_token
+        return response
 
 class autoManage(APIView):
     def patch(self, request):
