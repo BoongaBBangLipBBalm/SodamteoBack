@@ -1,3 +1,5 @@
+import re
+
 from django.shortcuts import render
 from rest_framework import viewsets, permissions, status, generics
 from rest_framework.response import Response
@@ -28,7 +30,8 @@ class CreateFarm(APIView):
 
         cropName = request.data.get('cropName')
         farmName = request.data.get('farmName')
-        devices = request.data.get('devices').strip('[]').replace(' ', '').split(',')
+        devices = (request.data.get('devices'))
+        devices = re.sub(r'\[|]$', '', devices).replace(' ', '').split(',')
 
         # 2 find user
         try:
@@ -40,7 +43,14 @@ class CreateFarm(APIView):
         farm = FarmProfile.objects.create(userID=userID, cropName=cropName, farmName=farmName)
 
         for device in devices:
-            Device.objects.create(farmID=farm, device=device, status=0)
+            if not device: break
+            Device.objects.create(farmID=farm, device=device, status=0, isAuto=False)
+
+        devices = farm.farm_devices.all()
+        if devices:
+            deviceSerializers = DeviceSerializer(devices, many=True).data
+        else:
+            deviceSerializers = "No Devices Yet"
 
         serializer = AllFarmSerializer(farm)
 
@@ -54,7 +64,9 @@ class CreateFarm(APIView):
         }
         new_token = jwt.encode(new_payload, settings.SECRET_KEY, algorithm='HS256')
 
-        response = Response(serializer.data, status.HTTP_201_CREATED)
+        response = Response({"message": "New Token Arrived",
+                             "farmInfo": serializer.data,
+                             "device": deviceSerializers}, status.HTTP_201_CREATED)
         response['Authorization'] = new_token
 
         return response
@@ -171,19 +183,8 @@ class UpdateFarm(APIView):
 
         serializer = SingleFarmSerializer(farm)
 
-        new_payload = {
-            'token_type': payload['token_type'],
-            'exp': payload['exp'],
-            'iat': payload['iat'],
-            'jti': payload['jti'],
-            'id': payload['id'],
-            'farmID': farm.farmID
-        }
-        new_token = jwt.encode(new_payload, settings.SECRET_KEY, algorithm='HS256')
-
-        response = Response({"FarmInfo": serializer.data,
-                             "message": "New Token Arrived"}, status.HTTP_200_OK)
-        response['Authorization'] = new_token
+        response = Response({"FarmInfo": serializer.data}, status.HTTP_200_OK)
+        response['Authorization'] = token
 
         return response
 
