@@ -55,7 +55,7 @@ class CreateFarm(APIView):
         new_token = jwt.encode(new_payload, settings.SECRET_KEY, algorithm='HS256')
 
         response = Response(serializer.data, status.HTTP_201_CREATED)
-        response['Authorization'] = 'Bearer ' + new_token
+        response['Authorization'] = new_token
 
         return response
 
@@ -81,7 +81,7 @@ class GetFarmList(APIView):
             serializerList.append(serializer.data)
 
         response = Response(serializerList, status.HTTP_200_OK)
-        response['Authorization'] = 'Bearer ' + auth_token
+        response['Authorization'] = auth_token
 
         return response
 
