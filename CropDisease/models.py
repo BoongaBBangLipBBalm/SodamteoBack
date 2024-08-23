@@ -11,6 +11,7 @@ class DiseaseLog(models.Model):
     disease = models.CharField(max_length=100)
     confidence = models.FloatField(null=True)
     timestamp = models.DateTimeField(auto_now_add=True)
+    img = models.TextField(null=True)
 
     class Meta:
         db_table = 'DiseaseLog'
