@@ -89,6 +89,7 @@ class GetFarmList(APIView):
 
         serializerList = []
         for farm in farmList:
+            saveFalseData(farm.farmID) #################### 가짜 데이터 save하므로 나중에 지우기
             serializer = AllFarmSerializer(farm)
             serializerList.append(serializer.data)
 
@@ -124,16 +125,14 @@ class GetFarm(APIView):
         # 4 serialize
         serializer = OnlyProfileSerializer(farm)
 
-        currEnvSerializers = saveFalseData(farmID) #######################################################################
-        # 위 코드는 가짜로 생성한 데이터를 받아오는 것이므로 실제로는 아래 코드를 실행해야 함
-        # environmentList = farm.farm_environment.all()
-        # currEnvSerializers = []
-        # cnt = 0
-        # for environment in environmentList:
-        #     currEnv = CurrEnvSerializer(environment)
-        #     currEnvSerializers.append(currEnv.data)
-        #     cnt += 1
-        #     if cnt == 5: break
+        environmentList = farm.farm_environment.all()
+        currEnvSerializers = []
+        cnt = 0
+        for environment in environmentList:
+            currEnv = CurrEnvSerializer(environment)
+            currEnvSerializers.append(currEnv.data)
+            cnt += 1
+            if cnt == 5: break
 
         devices = farm.farm_devices.all()
         if devices:
