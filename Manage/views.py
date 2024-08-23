@@ -81,6 +81,26 @@ class DeviceManager(APIView):
 
         return response
 
+    def delete(self, request):
+        auth_token = request.headers.get('Authorization', None).replace('Bearer ', '')
+        payload = jwt.decode(auth_token, settings.SECRET_KEY, algorithms='HS256')
+        farmID = payload['farmID']
+        device = request.data.get('device')
+
+        try:
+            farm = FarmProfile.objects.get(farmID=farmID)
+        except Exception as e:
+            return Response({"error": "Farm not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        if farm.farm_devices.filter(device=device).exists():
+            farm.farm_devices.filter(device=device).delete()
+            response = Response({"message": f"{device} deleted successfully"}, status=status.HTTP_200_OK)
+        else:
+            response = Response({"message": f"{device} not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        response['Authorization'] = auth_token
+        return response
+
 
 class autoManage(APIView):
     def patch(self, request):
