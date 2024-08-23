@@ -10,6 +10,5 @@ class DiseaseSerializer(serializers.ModelSerializer):
             'image',
             'disease',
             'timestamp',
-            'confidence',
-            'img'
+            'confidence'
         ]
