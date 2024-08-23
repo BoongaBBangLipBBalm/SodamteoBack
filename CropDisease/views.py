@@ -1,5 +1,9 @@
+import base64
 import os
+
+import cv2
 import jwt
+import numpy as np
 
 from rest_framework import status
 from rest_framework.response import Response
@@ -32,24 +36,11 @@ class DiseaseDetection(APIView):
         except FarmProfile.DoesNotExist:
             return Response({"error": "No Farm Profile"}, status=status.HTTP_404_NOT_FOUND)
 
-        # 이미지 파일을 입력 받음
-        image_file = request.FILES.get('image')
-        if not image_file:
-            return Response({"error": "No image provided"}, status=status.HTTP_400_BAD_REQUEST)
-
-        # 이미지 파일을 서버에 임시로 저장
-        temp_image_path = os.path.join(settings.MEDIA_ROOT, image_file.name)
-        with open(temp_image_path, 'wb+') as destination:
-            for chunk in image_file.chunks():
-                destination.write(chunk)
-
-        # 질병 탐지
-        disease, confidence = detect_disease(temp_image_path)
+        img = base64.b64decode(request.data.get('image').split(';base64,')[1])
+        img = cv2.imdecode(np.frombuffer(img, np.uint8), cv2.IMREAD_COLOR)
+        disease, confidence = detect_disease(np.array(img))
 
         DiseaseLog.objects.create(farmID=farm, disease=disease, confidence=confidence)
-
-        # 임시 파일 삭제
-        os.remove(temp_image_path)
 
         response = Response({
             "disease": disease,
