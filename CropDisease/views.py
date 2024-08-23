@@ -4,6 +4,7 @@ import os
 import cv2
 import jwt
 import numpy as np
+from django.core.files.base import ContentFile
 
 from rest_framework import status
 from rest_framework.response import Response
@@ -36,11 +37,22 @@ class DiseaseDetection(APIView):
         except FarmProfile.DoesNotExist:
             return Response({"error": "No Farm Profile"}, status=status.HTTP_404_NOT_FOUND)
 
-        img = base64.b64decode(request.data.get('image').split(';base64,')[1])
-        img = cv2.imdecode(np.frombuffer(img, np.uint8), cv2.IMREAD_COLOR)
+        ################################################
+        raw_data = request.data.get('image')
+        fmt, imgStr = raw_data.split(';base64,')
+        ext = fmt.split('/')[-1]
+
+        img_data = base64.b64decode(imgStr)
+
+        imgArr = np.frombuffer(img_data, dtype=np.uint8)
+        img = cv2.imdecode(imgArr, cv2.IMREAD_COLOR)
+
+        # image_file = ContentFile(img_data, name=f'image.{ext}')
+        ################################################
+
         disease, confidence = detect_disease(np.array(img))
 
-        DiseaseLog.objects.create(farmID=farm, disease=disease, confidence=confidence)
+        DiseaseLog.objects.create(farmID=farm, image=raw_data, disease=disease, confidence=confidence)
 
         response = Response({
             "disease": disease,

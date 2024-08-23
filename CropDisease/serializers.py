@@ -7,6 +7,7 @@ class DiseaseSerializer(serializers.ModelSerializer):
         model = DiseaseLog
         fields = [
             'id',
+            'image',
             'disease',
             'timestamp',
             'confidence'
