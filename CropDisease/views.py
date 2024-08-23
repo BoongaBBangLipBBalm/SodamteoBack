@@ -40,7 +40,7 @@ class DiseaseDetection(APIView):
         img = cv2.imdecode(np.frombuffer(img, np.uint8), cv2.IMREAD_COLOR)
         disease, confidence = detect_disease(np.array(img))
 
-        DiseaseLog.objects.create(farmID=farm, disease=disease, confidence=confidence)
+        DiseaseLog.objects.create(farmID=farm, disease=disease, confidence=confidence, img=img)
 
         response = Response({
             "disease": disease,
