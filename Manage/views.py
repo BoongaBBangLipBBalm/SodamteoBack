@@ -136,12 +136,13 @@ class autoManage(APIView):
             deviceStatus.status = new_status
             deviceStatus.isAuto = auto
             deviceStatus.save()
-            deviceSerializer = DeviceSerializer(deviceStatus)
-            return Response({"message": "Device updated successfully",
-                             "device": deviceSerializer.data}, status=status.HTTP_200_OK)
+
         else:
             deviceStatus.isAuto = auto
             deviceStatus.save()
-            deviceSerializer = DeviceSerializer(deviceStatus)
-            return Response({"message": "Auto mode disabled",
-                             "device": deviceSerializer}, status=status.HTTP_200_OK)
+
+        deviceSerializer = DeviceSerializer(deviceStatus)
+        return Response({
+            "message": "Auto mode updated",
+            "device": deviceSerializer.data
+        }, status=status.HTTP_200_OK)
